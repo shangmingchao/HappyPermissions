@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">HappyPermissions</string>
+    <string name="contacts">读取联系人</string>
+    <string name="camera">打开相机</string>
+    <string name="devices_and_files">读取手机信息并写入文件</string>
+    <string name="back">返回</string>
+    <string name="cancel">取消</string>
+    <string name="need_permission">授权</string>
+    <string name="next_step">下一步</string>
+    <string name="go_to_settings">去设置</string>
+    <string name="camera_is_not_available">相机不可用</string>
+    <string name="rationale_format">您需要授予以下权限:\n\n%1$s</string>
+    <string name="app_settings_rationale_format">为了使 EZPermissions 正常工作，请去设置页手动授予以下权限:\n\n%1$s</string>
+    <string name="rationale_read_contacts">为了方便自动填写，需要获取联系人信息</string>
+    <string name="rationale_camera">为了视频聊天，需要使用摄像头</string>
+    <string name="rationale_read_phone_state">为了获取设备唯一标识，需要拨打电话相关权限</string>
+    <string name="rationale_write_external_storage">为了保存图片，需要访问文件相关权限</string>
+</resources>
