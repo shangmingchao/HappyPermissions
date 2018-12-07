@@ -137,6 +137,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mSaveFilesTask.cancel(true);
+    }
+
     static class SaveFilesTask extends AsyncTask<String, Void, String> {
 
         private WeakReference<TextView> mDescWeakReference;

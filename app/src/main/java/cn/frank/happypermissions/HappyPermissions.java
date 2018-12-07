@@ -125,7 +125,7 @@ public class HappyPermissions {
     }
 
     public static void showRationaleDialog(final Activity activity, final int permissionsRequestCode,
-                                           final String[] rationalePermissions, PermissionCallbacks callbacks) {
+                                           final String[] rationalePermissions, final PermissionCallbacks callbacks) {
         new AlertDialog.Builder(activity)
                 .setTitle(activity.getString(R.string.need_permission))
                 .setMessage(callbacks.getRationale(rationalePermissions))
@@ -139,6 +139,7 @@ public class HappyPermissions {
                 .setNegativeButton(activity.getString(R.string.cancel), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        callbacks.onPermissionsDenied(permissionsRequestCode, rationalePermissions);
                         dialog.dismiss();
                     }
                 })
@@ -146,8 +147,9 @@ public class HappyPermissions {
                 .show();
     }
 
-    public static void showAppSettingsDialog(final Activity activity, final int settingsRequestCode,
-                                             String[] deniedPermissions, PermissionCallbacks callbacks) {
+    public static void showAppSettingsDialog(final Activity activity, final int permissionsRequestCode,
+                                             final int settingsRequestCode, final String[] deniedPermissions,
+                                             final PermissionCallbacks callbacks) {
         new AlertDialog.Builder(activity)
                 .setTitle(activity.getString(R.string.need_permission))
                 .setMessage(callbacks.getAppSettingsRationale(deniedPermissions))
@@ -163,6 +165,7 @@ public class HappyPermissions {
                 .setNegativeButton(activity.getString(R.string.cancel), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        callbacks.onPermissionsDenied(permissionsRequestCode, deniedPermissions);
                         dialog.dismiss();
                     }
                 })
@@ -196,7 +199,7 @@ public class HappyPermissions {
         } else if (required) {
             String[] rationalePermissions = HappyPermissions.shouldShowRequestPermissionRationale(activity, permissions);
             if (rationalePermissions.length == 0) {
-                showAppSettingsDialog(activity, settingsRequestCode, deniedPermissions, callbacks);
+                showAppSettingsDialog(activity, permissionsRequestCode, settingsRequestCode, deniedPermissions, callbacks);
             } else {
                 showRationaleDialog(activity, permissionsRequestCode, rationalePermissions, callbacks);
             }
