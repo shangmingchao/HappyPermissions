@@ -59,7 +59,8 @@ public class HappyPermissions {
                 PermissionChecker.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
     }
 
-    public static String[] shouldShowRequestPermissionRationale(@NonNull Activity activity, @Size(min = 1) String[] permissions) {
+    public static String[] shouldShowRequestPermissionRationale(@NonNull Activity activity,
+                                                                @Size(min = 1) String[] permissions) {
         List<String> rationaleList = new ArrayList<>();
         for (String perm : permissions) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(activity, perm)) {
@@ -84,7 +85,8 @@ public class HappyPermissions {
         return deniedList.toArray(new String[0]);
     }
 
-    public static String getDefaultRationale(Activity activity, String[] rationalePermissions) {
+    public static String getDefaultRationale(@NonNull Activity activity,
+                                             @NonNull String[] rationalePermissions) {
         SpannableStringBuilder rationale = new SpannableStringBuilder("");
         for (int i = 0; i < rationalePermissions.length; i++) {
             String permission = rationalePermissions[i];
@@ -99,12 +101,15 @@ public class HappyPermissions {
                 rationale.append("【").append(activity.getString(R.string.rationale_read_phone_state)).append("】");
             } else if (Manifest.permission.WRITE_EXTERNAL_STORAGE.equals(permission)) {
                 rationale.append("【").append(activity.getString(R.string.rationale_write_external_storage)).append("】");
+            } else if (Manifest.permission.ACCESS_COARSE_LOCATION.equals(permission)) {
+                rationale.append("【").append(activity.getString(R.string.rationale_access_coarse_location)).append("】");
             }
         }
         return String.format(activity.getString(R.string.rationale_format), rationale);
     }
 
-    public static String getDefaultAppSettingsRationale(Activity activity, String[] deniedPermissions) {
+    public static String getDefaultAppSettingsRationale(@NonNull Activity activity,
+                                                        @NonNull String[] deniedPermissions) {
         SpannableStringBuilder rationale = new SpannableStringBuilder("");
         for (int i = 0; i < deniedPermissions.length; i++) {
             String permission = deniedPermissions[i];
@@ -119,13 +124,16 @@ public class HappyPermissions {
                 rationale.append("【").append(activity.getString(R.string.rationale_read_phone_state)).append("】");
             } else if (Manifest.permission.WRITE_EXTERNAL_STORAGE.equals(permission)) {
                 rationale.append("【").append(activity.getString(R.string.rationale_write_external_storage)).append("】");
+            } else if (Manifest.permission.ACCESS_COARSE_LOCATION.equals(permission)) {
+                rationale.append("【").append(activity.getString(R.string.rationale_access_coarse_location)).append("】");
             }
         }
         return String.format(activity.getString(R.string.app_settings_rationale_format), rationale);
     }
 
-    public static void showRationaleDialog(final Activity activity, final int permissionsRequestCode,
-                                           final String[] rationalePermissions, final PermissionCallbacks callbacks) {
+    public static void showRationaleDialog(@NonNull final Activity activity, final int permissionsRequestCode,
+                                           @NonNull final String[] rationalePermissions,
+                                           @NonNull final PermissionCallbacks callbacks) {
         new AlertDialog.Builder(activity)
                 .setTitle(activity.getString(R.string.need_permission))
                 .setMessage(callbacks.getRationale(rationalePermissions))
@@ -147,9 +155,9 @@ public class HappyPermissions {
                 .show();
     }
 
-    public static void showAppSettingsDialog(final Activity activity, final int permissionsRequestCode,
-                                             final int settingsRequestCode, final String[] deniedPermissions,
-                                             final PermissionCallbacks callbacks) {
+    public static void showAppSettingsDialog(@NonNull final Activity activity, final int permissionsRequestCode,
+                                             final int settingsRequestCode, @NonNull final String[] deniedPermissions,
+                                             @NonNull final PermissionCallbacks callbacks) {
         new AlertDialog.Builder(activity)
                 .setTitle(activity.getString(R.string.need_permission))
                 .setMessage(callbacks.getAppSettingsRationale(deniedPermissions))
@@ -173,8 +181,9 @@ public class HappyPermissions {
                 .show();
     }
 
-    public static void happyRequestPermissions(Activity activity, int permissionsRequestCode, String[] permissions,
-                                               PermissionCallbacks callbacks) {
+    public static void happyRequestPermissions(@NonNull Activity activity, int permissionsRequestCode,
+                                               @NonNull String[] permissions,
+                                               @NonNull PermissionCallbacks callbacks) {
         if (!HappyPermissions.checkSelfPermissions(activity, permissions)) {
             String[] rationalePermissions = HappyPermissions.shouldShowRequestPermissionRationale(
                     activity, permissions);
@@ -192,7 +201,7 @@ public class HappyPermissions {
                                                   @NonNull int[] grantResults,
                                                   Activity activity, int permissionsRequestCode,
                                                   int settingsRequestCode, boolean required,
-                                                  PermissionCallbacks callbacks) {
+                                                  @NonNull PermissionCallbacks callbacks) {
         String[] deniedPermissions = HappyPermissions.getDeniedPermissions(permissions, grantResults);
         if (deniedPermissions.length == 0) {
             callbacks.onPermissionsGranted(permissionsRequestCode, permissions);

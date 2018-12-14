@@ -1,18 +1,26 @@
 <resources>
     <string name="app_name">HappyPermissions</string>
-    <string name="contacts">读取联系人</string>
-    <string name="camera">打开相机</string>
-    <string name="devices_and_files">读取手机信息并写入文件</string>
+    <string name="contacts">读取联系人【强制】</string>
+    <string name="camera">打开相机【可选】</string>
+    <string name="devices_and_files">获取设备ID并写入文件【强制】</string>
+    <string name="device_id_desc_format">成功获取设备ID: %1$s</string>
+    <string name="save_files_succeed">写入文件成功: %1$s</string>
+    <string name="save_files_failed">写入文件失败</string>
+    <string name="location">获取位置（Fragment 申请权限【强制】）</string>
     <string name="back">返回</string>
     <string name="cancel">取消</string>
     <string name="need_permission">授权</string>
     <string name="next_step">下一步</string>
     <string name="go_to_settings">去设置</string>
     <string name="camera_is_not_available">相机不可用</string>
+    <string name="network_location_is_not_available">网络定位不可用</string>
+    <string name="network_location_updated">网络定位已更新: %1$s</string>
+    <string name="network_location_last">最近的网络定位: %1$s</string>
     <string name="rationale_format">您需要授予以下权限:\n\n%1$s</string>
-    <string name="app_settings_rationale_format">为了使 EZPermissions 正常工作，请去设置页手动授予以下权限:\n\n%1$s</string>
+    <string name="app_settings_rationale_format">为了使 HappyPermissions 正常工作，请去设置页手动授予以下权限:\n\n%1$s</string>
     <string name="rationale_read_contacts">为了方便自动填写，需要获取联系人信息</string>
     <string name="rationale_camera">为了视频聊天，需要使用摄像头</string>
     <string name="rationale_read_phone_state">为了获取设备唯一标识，需要拨打电话相关权限</string>
     <string name="rationale_write_external_storage">为了保存图片，需要访问文件相关权限</string>
+    <string name="rationale_access_coarse_location">为了统计信息，需要访问您的位置</string>
 </resources>

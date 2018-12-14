@@ -6,6 +6,9 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <uses-feature android:name="android.hardware.location.network" />
 
     <application
         android:allowBackup="true"
@@ -29,10 +32,15 @@
                 <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
         </activity>
-        <activity android:name=".ContactsActivity"
-            android:label="@string/contacts"/>
-        <activity android:name=".CameraActivity"
+        <activity
+            android:name=".ContactsActivity"
+            android:label="@string/contacts" />
+        <activity
+            android:name=".CameraActivity"
             android:label="@string/camera" />
+        <activity
+            android:name=".LocationActivity"
+            android:label="@string/location" />
     </application>
 
 </manifest>

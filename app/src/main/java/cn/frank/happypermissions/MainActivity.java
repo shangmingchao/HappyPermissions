@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         Button contactsButton = findViewById(R.id.contacts);
         Button cameraButton = findViewById(R.id.camera);
         Button devicesAndFilesButton = findViewById(R.id.devices_and_files);
+        Button locationButton = findViewById(R.id.location);
         mDescTextView = findViewById(R.id.desc);
         mContactsPermissionCallbacks = new HappyPermissionCallbacks(MainActivity.this) {
             @Override
@@ -88,6 +89,12 @@ public class MainActivity extends AppCompatActivity {
                         PERMISSION_DEVICES_AND_FILES, mDevicesAndFilesPermissionCallbacks);
             }
         });
+        locationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(LocationActivity.getIntent(MainActivity.this));
+            }
+        });
     }
 
     private void showContacts() {
@@ -98,10 +105,11 @@ public class MainActivity extends AppCompatActivity {
         startActivity(CameraActivity.getIntent(MainActivity.this));
     }
 
-    @SuppressLint("MissingPermission")
+    @SuppressLint({"MissingPermission", "HardwareIds"})
     private void getDeviceIdAndWriteToFiles() {
         TelephonyManager telephonyManager = (TelephonyManager) MainActivity.this.getApplicationContext().getSystemService(TELEPHONY_SERVICE);
         final String deviceId = telephonyManager.getDeviceId();
+        mDescTextView.setText(String.format(getString(R.string.device_id_desc_format), deviceId));
         mSaveFilesTask = new SaveFilesTask(mDescTextView);
         mSaveFilesTask.execute(deviceId);
     }
@@ -140,12 +148,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mSaveFilesTask.cancel(true);
+        if (mSaveFilesTask != null) {
+            mSaveFilesTask.cancel(true);
+        }
     }
 
     static class SaveFilesTask extends AsyncTask<String, Void, String> {
 
         private WeakReference<TextView> mDescWeakReference;
+        private final String cacheDir = Environment.getExternalStorageDirectory() + File.separator;
 
         public SaveFilesTask(TextView descTextView) {
             mDescWeakReference = new WeakReference<>(descTextView);
@@ -155,16 +166,20 @@ public class MainActivity extends AppCompatActivity {
         protected String doInBackground(String... strings) {
             FileOutputStream fileOutputStream = null;
             OutputStreamWriter outputStreamWriter = null;
+            String cacheString = null;
             try {
-                File cacheDirectory = new File(Environment.getExternalStorageDirectory() + File.separator);
-                if (cacheDirectory.mkdirs() || (cacheDirectory.exists() && cacheDirectory.isDirectory())) {
+                Thread.sleep(2000);
+                File cacheDirectory = new File(cacheDir);
+                boolean initCacheDir = cacheDirectory.mkdirs() || (cacheDirectory.exists() && cacheDirectory.isDirectory());
+                if (initCacheDir) {
                     File cacheFile = new File(cacheDirectory, "deviceId.txt");
                     fileOutputStream = new FileOutputStream(cacheFile);
                     outputStreamWriter = new OutputStreamWriter(fileOutputStream);
-                    String cacheString = strings[0];
+                    cacheString = strings[0];
                     if (!TextUtils.isEmpty(cacheString)) {
                         outputStreamWriter.write(cacheString);
                     }
+                    return cacheFile.getAbsolutePath();
                 }
             } catch (Exception cacheException) {
                 cacheException.printStackTrace();
@@ -184,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-            return strings[0];
+            return null;
         }
 
         @Override
@@ -192,7 +207,14 @@ public class MainActivity extends AppCompatActivity {
             super.onPostExecute(result);
             TextView descTextView = mDescWeakReference.get();
             if (descTextView != null) {
-                descTextView.setText(result);
+                if (!TextUtils.isEmpty(result)) {
+                    descTextView.setText(String.format(descTextView.getContext()
+                                    .getResources().getString(R.string.save_files_succeed),
+                            result));
+                } else {
+                    descTextView.setText(descTextView.getContext()
+                            .getResources().getString(R.string.save_files_failed));
+                }
             }
         }
     }
