@@ -2,6 +2,7 @@ package cn.frank.happypermissions;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -131,10 +132,10 @@ public class HappyPermissions {
         return String.format(activity.getString(R.string.app_settings_rationale_format), rationale);
     }
 
-    public static void showRationaleDialog(@NonNull final Activity activity, final int permissionsRequestCode,
-                                           @NonNull final String[] rationalePermissions,
-                                           @NonNull final PermissionCallbacks callbacks) {
-        new AlertDialog.Builder(activity)
+    public static Dialog showRationaleDialog(@NonNull final Activity activity, final int permissionsRequestCode,
+                                             @NonNull final String[] rationalePermissions,
+                                             @NonNull final PermissionCallbacks callbacks) {
+        return new AlertDialog.Builder(activity)
                 .setTitle(activity.getString(R.string.need_permission))
                 .setMessage(callbacks.getRationale(rationalePermissions))
                 .setPositiveButton(activity.getString(R.string.next_step), new DialogInterface.OnClickListener() {
@@ -155,10 +156,10 @@ public class HappyPermissions {
                 .show();
     }
 
-    public static void showAppSettingsDialog(@NonNull final Activity activity, final int permissionsRequestCode,
-                                             final int settingsRequestCode, @NonNull final String[] deniedPermissions,
-                                             @NonNull final PermissionCallbacks callbacks) {
-        new AlertDialog.Builder(activity)
+    public static Dialog showAppSettingsDialog(@NonNull final Activity activity, final int permissionsRequestCode,
+                                               final int settingsRequestCode, @NonNull final String[] deniedPermissions,
+                                               @NonNull final PermissionCallbacks callbacks) {
+        return new AlertDialog.Builder(activity)
                 .setTitle(activity.getString(R.string.need_permission))
                 .setMessage(callbacks.getAppSettingsRationale(deniedPermissions))
                 .setPositiveButton(activity.getString(R.string.go_to_settings), new DialogInterface.OnClickListener() {
@@ -181,40 +182,44 @@ public class HappyPermissions {
                 .show();
     }
 
-    public static void happyRequestPermissions(@NonNull Activity activity, int permissionsRequestCode,
+    public static Dialog happyRequestPermissions(@NonNull Activity activity, int permissionsRequestCode,
                                                @NonNull String[] permissions,
                                                @NonNull PermissionCallbacks callbacks) {
+        Dialog dialog = null;
         if (!HappyPermissions.checkSelfPermissions(activity, permissions)) {
             String[] rationalePermissions = HappyPermissions.shouldShowRequestPermissionRationale(
                     activity, permissions);
             if (rationalePermissions.length > 0) {
-                showRationaleDialog(activity, permissionsRequestCode, rationalePermissions, callbacks);
+                dialog = showRationaleDialog(activity, permissionsRequestCode, rationalePermissions, callbacks);
             } else {
                 HappyPermissions.requestPermissions(activity, permissions, permissionsRequestCode);
             }
         } else {
             callbacks.onPermissionsGranted(permissionsRequestCode, permissions);
         }
+        return dialog;
     }
 
-    public static void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+    public static Dialog onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                                   @NonNull int[] grantResults,
                                                   Activity activity, int permissionsRequestCode,
                                                   int settingsRequestCode, boolean required,
                                                   @NonNull PermissionCallbacks callbacks) {
+        Dialog dialog = null;
         String[] deniedPermissions = HappyPermissions.getDeniedPermissions(permissions, grantResults);
         if (deniedPermissions.length == 0) {
             callbacks.onPermissionsGranted(permissionsRequestCode, permissions);
         } else if (required) {
             String[] rationalePermissions = HappyPermissions.shouldShowRequestPermissionRationale(activity, permissions);
             if (rationalePermissions.length == 0) {
-                showAppSettingsDialog(activity, permissionsRequestCode, settingsRequestCode, deniedPermissions, callbacks);
+                dialog = showAppSettingsDialog(activity, permissionsRequestCode, settingsRequestCode, deniedPermissions, callbacks);
             } else {
-                showRationaleDialog(activity, permissionsRequestCode, rationalePermissions, callbacks);
+                dialog = showRationaleDialog(activity, permissionsRequestCode, rationalePermissions, callbacks);
             }
         } else {
             callbacks.onPermissionsDenied(permissionsRequestCode, deniedPermissions);
         }
+        return dialog;
     }
 
     public interface PermissionCallbacks {

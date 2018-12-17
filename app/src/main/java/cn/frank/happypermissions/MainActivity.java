@@ -2,6 +2,7 @@ package cn.frank.happypermissions;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -20,6 +21,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -32,7 +35,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String[] PERMISSION_CONTACTS = new String[]{Manifest.permission.READ_CONTACTS};
     private static final String[] PERMISSION_CAMERA = new String[]{Manifest.permission.CAMERA};
-    private static final String[] PERMISSION_DEVICES_AND_FILES = new String[]{Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+    private static final String[] PERMISSION_DEVICES_AND_FILES = new String[]{
+            Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
     private HappyPermissions.PermissionCallbacks mContactsPermissionCallbacks;
     private HappyPermissions.PermissionCallbacks mCameraPermissionCallbacks;
@@ -40,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView mDescTextView;
     private SaveFilesTask mSaveFilesTask;
+    private List<Dialog> mDialogList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,22 +76,22 @@ public class MainActivity extends AppCompatActivity {
         contactsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                HappyPermissions.happyRequestPermissions(MainActivity.this, RC_CONTACTS,
-                        PERMISSION_CONTACTS, mContactsPermissionCallbacks);
+                addDialog(HappyPermissions.happyRequestPermissions(MainActivity.this, RC_CONTACTS,
+                        PERMISSION_CONTACTS, mContactsPermissionCallbacks));
             }
         });
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                HappyPermissions.happyRequestPermissions(MainActivity.this, RC_CAMERA,
-                        PERMISSION_CAMERA, mCameraPermissionCallbacks);
+                addDialog(HappyPermissions.happyRequestPermissions(MainActivity.this, RC_CAMERA,
+                        PERMISSION_CAMERA, mCameraPermissionCallbacks));
             }
         });
         devicesAndFilesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                HappyPermissions.happyRequestPermissions(MainActivity.this, RC_DEVICES_AND_FILES,
-                        PERMISSION_DEVICES_AND_FILES, mDevicesAndFilesPermissionCallbacks);
+                addDialog(HappyPermissions.happyRequestPermissions(MainActivity.this, RC_DEVICES_AND_FILES,
+                        PERMISSION_DEVICES_AND_FILES, mDevicesAndFilesPermissionCallbacks));
             }
         });
         locationButton.setOnClickListener(new View.OnClickListener() {
@@ -107,7 +112,8 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint({"MissingPermission", "HardwareIds"})
     private void getDeviceIdAndWriteToFiles() {
-        TelephonyManager telephonyManager = (TelephonyManager) MainActivity.this.getApplicationContext().getSystemService(TELEPHONY_SERVICE);
+        TelephonyManager telephonyManager = (TelephonyManager) MainActivity.this
+                .getApplicationContext().getSystemService(TELEPHONY_SERVICE);
         final String deviceId = telephonyManager.getDeviceId();
         mDescTextView.setText(String.format(getString(R.string.device_id_desc_format), deviceId));
         mSaveFilesTask = new SaveFilesTask(mDescTextView);
@@ -119,14 +125,17 @@ public class MainActivity extends AppCompatActivity {
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == RC_CONTACTS) {
-            HappyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults,
-                    MainActivity.this, RC_CONTACTS, RC_SETTINGS_CONTACTS, true, mContactsPermissionCallbacks);
+            addDialog(HappyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults,
+                    MainActivity.this, RC_CONTACTS, RC_SETTINGS_CONTACTS,
+                    true, mContactsPermissionCallbacks));
         } else if (requestCode == RC_CAMERA) {
-            HappyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults,
-                    MainActivity.this, RC_CAMERA, RC_SETTINGS_CAMERA, false, mCameraPermissionCallbacks);
+            addDialog(HappyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults,
+                    MainActivity.this, RC_CAMERA, RC_SETTINGS_CAMERA,
+                    false, mCameraPermissionCallbacks));
         } else if (requestCode == RC_DEVICES_AND_FILES) {
-            HappyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults,
-                    MainActivity.this, RC_DEVICES_AND_FILES, RC_SETTINGS_DEVICES_AND_FILES, true, mDevicesAndFilesPermissionCallbacks);
+            addDialog(HappyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults,
+                    MainActivity.this, RC_DEVICES_AND_FILES, RC_SETTINGS_DEVICES_AND_FILES,
+                    true, mDevicesAndFilesPermissionCallbacks));
         }
     }
 
@@ -134,23 +143,39 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SETTINGS_CONTACTS) {
-            HappyPermissions.happyRequestPermissions(MainActivity.this, RC_CONTACTS,
-                    PERMISSION_CONTACTS, mContactsPermissionCallbacks);
+            addDialog(HappyPermissions.happyRequestPermissions(MainActivity.this, RC_CONTACTS,
+                    PERMISSION_CONTACTS, mContactsPermissionCallbacks));
         } else if (requestCode == RC_SETTINGS_CAMERA) {
-            HappyPermissions.happyRequestPermissions(MainActivity.this, RC_CAMERA,
-                    PERMISSION_CAMERA, mCameraPermissionCallbacks);
+            addDialog(HappyPermissions.happyRequestPermissions(MainActivity.this, RC_CAMERA,
+                    PERMISSION_CAMERA, mCameraPermissionCallbacks));
         } else if (requestCode == RC_SETTINGS_DEVICES_AND_FILES) {
-            HappyPermissions.happyRequestPermissions(MainActivity.this, RC_DEVICES_AND_FILES,
-                    PERMISSION_DEVICES_AND_FILES, mDevicesAndFilesPermissionCallbacks);
+            addDialog(HappyPermissions.happyRequestPermissions(MainActivity.this, RC_DEVICES_AND_FILES,
+                    PERMISSION_DEVICES_AND_FILES, mDevicesAndFilesPermissionCallbacks));
         }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        removeAllDialog();
         if (mSaveFilesTask != null) {
             mSaveFilesTask.cancel(true);
         }
+    }
+
+    private void addDialog(Dialog dialog) {
+        if (dialog != null) {
+            mDialogList.add(dialog);
+        }
+    }
+
+    private void removeAllDialog() {
+        for (Dialog dialog : mDialogList) {
+            if (dialog != null && dialog.isShowing()) {
+                dialog.dismiss();
+            }
+        }
+        mDialogList.clear();
     }
 
     static class SaveFilesTask extends AsyncTask<String, Void, String> {
@@ -170,7 +195,8 @@ public class MainActivity extends AppCompatActivity {
             try {
                 Thread.sleep(2000);
                 File cacheDirectory = new File(cacheDir);
-                boolean initCacheDir = cacheDirectory.mkdirs() || (cacheDirectory.exists() && cacheDirectory.isDirectory());
+                boolean initCacheDir = cacheDirectory.mkdirs() ||
+                        (cacheDirectory.exists() && cacheDirectory.isDirectory());
                 if (initCacheDir) {
                     File cacheFile = new File(cacheDirectory, "deviceId.txt");
                     fileOutputStream = new FileOutputStream(cacheFile);
