@@ -183,8 +183,8 @@ public class HappyPermissions {
     }
 
     public static Dialog happyRequestPermissions(@NonNull Activity activity, int permissionsRequestCode,
-                                               @NonNull String[] permissions,
-                                               @NonNull PermissionCallbacks callbacks) {
+                                                 @NonNull String[] permissions,
+                                                 @NonNull PermissionCallbacks callbacks) {
         Dialog dialog = null;
         if (!HappyPermissions.checkSelfPermissions(activity, permissions)) {
             String[] rationalePermissions = HappyPermissions.shouldShowRequestPermissionRationale(
@@ -201,10 +201,10 @@ public class HappyPermissions {
     }
 
     public static Dialog onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                                  @NonNull int[] grantResults,
-                                                  Activity activity, int permissionsRequestCode,
-                                                  int settingsRequestCode, boolean required,
-                                                  @NonNull PermissionCallbacks callbacks) {
+                                                    @NonNull int[] grantResults,
+                                                    Activity activity, int permissionsRequestCode,
+                                                    int settingsRequestCode, boolean required,
+                                                    @NonNull PermissionCallbacks callbacks) {
         Dialog dialog = null;
         String[] deniedPermissions = HappyPermissions.getDeniedPermissions(permissions, grantResults);
         if (deniedPermissions.length == 0) {
